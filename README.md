@@ -1,5 +1,5 @@
 # knucleotide-rs
-benchmark for benchmarksgame-team.pages.debian.net
+benchmark for https://benchmarksgame-team.pages.debian.net/benchmarksgame/performance/knucleotide.html
 
 ## run
 
