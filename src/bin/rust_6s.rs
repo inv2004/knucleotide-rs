@@ -15,6 +15,7 @@ use std::sync::Arc;
 use std::hash::{Hasher, BuildHasherDefault};
 use futures::Future;
 use futures_cpupool::CpuPool;
+use futures::executor::*;
 use Item::*;
 use indexmap::IndexMap;
 

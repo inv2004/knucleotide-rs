@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["inv2004 <inv2004@gmail.com>"]
 
 [dependencies]
-futures = "0.1.19"
+futures = "0.1.21"
 futures-cpupool = "*"
 indexmap = "*"
 rayon = "*"
@@ -16,7 +16,7 @@ opt-level = 3
 lto = true
 debug = false
 debug-assertions = false
-codegen-units = 1
+# codegen-units = 1
 panic = 'abort'
-incremental = false
+# incremental = false
 overflow-checks = false
