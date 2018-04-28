@@ -6,6 +6,10 @@
 // contributed by TeXitoi
 // Rust #4 modified to use same get_seq as Rust #3
 
+#![feature(test)]
+
+extern crate test;
+
 extern crate futures;
 extern crate futures_cpupool;
 extern crate indexmap;
@@ -17,6 +21,9 @@ use futures::Future;
 use futures_cpupool::CpuPool;
 use Item::*;
 use indexmap::IndexMap;
+use std::fs::File;
+use std::io::BufReader;
+
 
 struct NaiveHasher(u64);
 impl Default for NaiveHasher {
@@ -164,11 +171,10 @@ fn get_seq<R: std::io::BufRead>(r: R, key: &str) -> Vec<u8> {
     res
 }
 
-fn main() {
+fn calc<R: std::io::BufRead>(r: R) {
     let now = Instant::now();
 
-    let stdin = std::io::stdin();
-    let input = get_seq(stdin.lock(), ">THREE");
+    let input = get_seq(r, ">THREE");
     let input = Arc::new(input);
     let pool = CpuPool::new_num_cpus();
 
@@ -188,3 +194,22 @@ fn main() {
     println!("Seconds: {}", sec);
 }
 
+fn main() {
+    let stdin = std::io::stdin();
+    calc(stdin.lock());
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_knuc_rust_6(b: &mut Bencher) {
+        b.iter(|| {
+            let file = File::open("in250k.txt").unwrap();
+            let buf = BufReader::new(file);
+            calc(buf)
+        });
+    }
+}

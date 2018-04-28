@@ -1,3 +1,7 @@
+#![feature(test)]
+
+extern crate test;
+
 extern crate itertools;
 extern crate indexmap;
 extern crate num;
@@ -13,6 +17,8 @@ use num::{ToPrimitive, FromPrimitive};
 use futures::Future;
 use futures_cpupool::CpuPool;
 use std::sync::Arc;
+use std::fs::File;
+use std::io::BufReader;
 
 struct NaiveHasher<T>(T);
 impl<T: Default> Default for NaiveHasher<T> {
@@ -31,7 +37,7 @@ impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
         self.0 = T::from_u8(i).unwrap();
     }
     fn write_u16(&mut self, i: u16) {
-        self.0 = T::from_u16(i).unwrap();
+        self.0 = T::from_u16(i ^ i >> 7).unwrap();
     }
     fn write_u32(&mut self, i: u32) {
         self.0 = T::from_u32(i ^ i >> 7).unwrap();
@@ -125,11 +131,8 @@ fn get_seq<R: std::io::BufRead>(r: R, key: &str) -> Vec<u8> {
     res
 }
 
-fn main() {
-  let now = Instant::now();
-
-  let stdin = std::io::stdin();
-  let s_vec = get_seq(stdin.lock(), ">THREE");
+fn calc<R: std::io::BufRead>(r: R) {
+  let s_vec = get_seq(r, ">THREE");
   let s_len = s_vec.len();
 
   let pool = CpuPool::new_num_cpus();
@@ -156,9 +159,30 @@ fn main() {
   print::<u16>(f5.wait().unwrap(), "GGTATT");
   print::<u32>(f6.wait().unwrap(), "GGTATTTTAATT");
   print::<u64>(f7.wait().unwrap(), "GGTATTTTAATTTATAGT");
+}
+
+fn main() {
+  let now = Instant::now();
+
+  let stdin = std::io::stdin();
+  calc(stdin.lock());
 
   let elapsed = now.elapsed();
   let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
   println!("Seconds: {}", sec);
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_knuc_main(b: &mut Bencher) {
+        b.iter(|| {
+            let file = File::open("in250k.txt").unwrap();
+            let buf = BufReader::new(file);
+            calc(buf)
+        });
+    }
+}

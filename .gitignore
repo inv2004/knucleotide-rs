@@ -1,4 +1,4 @@
 /target
 **/*.rs.bk
-in25m.txt
+in25*.txt
 Cargo.lock
