@@ -1,7 +1,7 @@
 [package]
 name = "knucleotide-rs"
 version = "0.1.0"
-authors = ["inv2004 <inv2004@gmail.com>"]
+authors = ["inv2004"]
 
 [dependencies]
 futures = "0.1.21"
