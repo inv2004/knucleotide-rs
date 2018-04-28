@@ -37,10 +37,10 @@ impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
         self.0 = T::from_u8(i).unwrap();
     }
     fn write_u16(&mut self, i: u16) {
-        self.0 = T::from_u16(i ^ i >> 7).unwrap();
+        self.0 = T::from_u16(i).unwrap();
     }
     fn write_u32(&mut self, i: u32) {
-        self.0 = T::from_u32(i ^ i >> 7).unwrap();
+        self.0 = T::from_u32(i ^ i >> 6).unwrap();
     }
     fn write_u64(&mut self, i: u64) {
         self.0 = T::from_u64(i ^ i >> 7).unwrap();
@@ -116,10 +116,14 @@ fn freq<T: FromPrimitive+ToPrimitive+Default+std::hash::Hash+std::cmp::Eq+ShlXor
   let mask = T::mask(len);
   let mut it = s_vec.iter();
   let mut a = it.by_ref().take(len-1).fold(T::default(), |acc, &x| T::sh(acc, x, mask));
-  it.for_each(|&x| {
+//   it.for_each(|&x| {
+//       a = T::sh(a, x, mask);
+//       *h.entry(a).or_insert(0) += 1;
+//   });
+  for &x in it {
       a = T::sh(a, x, mask);
-      *h.entry(a).or_insert(0) += 1;
-  });
+      *h.entry(a).or_insert(0) += 1;      
+  }
   h
 }
 
