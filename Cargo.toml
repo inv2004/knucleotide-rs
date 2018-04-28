@@ -1,0 +1,22 @@
+[package]
+name = "knucleotide-rs"
+version = "0.1.0"
+authors = ["inv2004 <inv2004@gmail.com>"]
+
+[dependencies]
+futures = "0.1.19"
+futures-cpupool = "*"
+indexmap = "*"
+rayon = "*"
+itertools = "*"
+num = "*"
+
+[profile.release]
+opt-level = 3
+lto = true
+debug = false
+debug-assertions = false
+codegen-units = 1
+panic = 'abort'
+incremental = false
+overflow-checks = false
