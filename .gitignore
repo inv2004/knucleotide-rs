@@ -2,3 +2,4 @@
 **/*.rs.bk
 in25*.txt
 Cargo.lock
+/indexmap
