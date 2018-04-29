@@ -58,25 +58,25 @@ trait ShlXorMsk<T> {
 
 impl ShlXorMsk<u8> for u8 {
 #[inline]
-    fn sh(a: u8, x: u8, m:u8) -> u8 { m & (a<<2)|x}
-    fn mask(len: usize) -> u8 { ((1u16 << 2*len) - 1) as u8}
+    fn sh(a: u8, x: u8, m:u8) -> u8 { m & (a<<2)|x }
+    fn mask(len: usize) -> u8 { ((1u16 << 2*len) - 1) as u8 }
 }
 
 impl ShlXorMsk<u16> for u16 {
 #[inline]
-    fn sh(a: u16, x: u8, m:u16) -> u16 { m & (a<<2)|(x as u16)}
+    fn sh(a: u16, x: u8, m:u16) -> u16 { m & (a<<2)|(x as u16) }
     fn mask(len: usize) -> u16 { ((1u32 << 2*len) - 1) as u16 }
 }
 
 impl ShlXorMsk<u32> for u32 {
 #[inline]
-    fn sh(a: u32, x: u8, m:u32) -> u32 { m & (a<<2)|(x as u32)}
+    fn sh(a: u32, x: u8, m:u32) -> u32 { m & (a<<2)|(x as u32) }
     fn mask(len: usize) -> u32 { ((1u64 << 2*len) - 1) as u32 }
 }
 
 impl ShlXorMsk<u64> for u64 {
 #[inline]
-    fn sh(a: u64, x: u8, m:u64) -> u64 { m & (a<<2)|(x as u64)}
+    fn sh(a: u64, x: u8, m:u64) -> u64 { m & (a<<2)|(x as u64) }
     fn mask(len: usize) -> u64 { (1u64 << 2*len) - 1 }
 }
 
@@ -116,10 +116,6 @@ fn freq<T: FromPrimitive+ToPrimitive+Default+std::hash::Hash+std::cmp::Eq+ShlXor
   let mask = T::mask(len);
   let mut it = s_vec.iter();
   let mut a = it.by_ref().take(len-1).fold(T::default(), |acc, &x| T::sh(acc, x, mask));
-//   it.for_each(|&x| {
-//       a = T::sh(a, x, mask);
-//       *h.entry(a).or_insert(0) += 1;
-//   });
   for &x in it {
       a = T::sh(a, x, mask);
       *h.entry(a).or_insert(0) += 1;      
