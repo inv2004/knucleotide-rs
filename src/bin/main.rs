@@ -86,15 +86,17 @@ fn match_key(k: u8) -> char {
     }
 }
 
-fn print_stat(h: Map<u8>, s_len: usize, seq_len: usize) {
+fn print_stat(h: Map<u8>, seq_len: usize) {
+  let total = h.values().sum::<u32>();
+
   h.into_iter().sorted_by(|&(ref a,x), &(ref b,y)| {
     let ord1 = Ord::cmp(&y, &x);
     if ord1 == Ordering::Equal { Ord::cmp(&b, &a) } else { ord1 }
   }).iter().for_each(|(k,v)| {
           if seq_len == 1 {
-              println!("{} {:.3}", match_key(*k), (100 * v) as f32 / s_len as f32);
+              println!("{} {:.3}", match_key(*k), (100 * v) as f32 / total as f32);
           } else {
-              println!("{}{} {:.3}", match_key(*k>>2), match_key(0b11&*k), (100 * v) as f32 / s_len as f32);
+              println!("{}{} {:.3}", match_key(*k>>2), match_key(0b11&*k), (100 * v) as f32 / total as f32);
           };
   });
   println!();
@@ -104,7 +106,7 @@ fn print<T: FromPrimitive+ToPrimitive+Default+std::hash::Hash+std::cmp::Eq+ShlXo
   let mask = T::from_u64((1u64 << (2*seq.len() as u32)) - 1).unwrap();
   let k = seq.to_ascii_lowercase().as_bytes().iter()
             .map(|x| 0b11u8 & x>>1).fold(T::default(), |acc, x| T::sh(acc,x,mask));
-  println!("{}\t{}", h[&k], seq);
+  println!("{}\t{}", h.get(&k).unwrap_or(&0), seq);
 }
 
 fn freq<T: FromPrimitive+ToPrimitive+Default+std::hash::Hash+std::cmp::Eq+ShlXorMsk<T>+Copy>(s_vec:&[u8], len: usize) -> Map<T> {
@@ -129,7 +131,6 @@ fn get_seq<R: std::io::BufRead>(r: R, key: &str) -> Vec<u8> {
 
 fn calc<R: std::io::BufRead>(r: R) {
   let s_vec = get_seq(r, ">THREE");
-  let s_len = s_vec.len();
 
   let pool = CpuPool::new_num_cpus();
 
@@ -148,8 +149,8 @@ fn calc<R: std::io::BufRead>(r: R) {
   let f3 = pool.spawn_fn(move || Ok::<_,()>(freq(&s5, 3)));
   let f2 = pool.spawn_fn(move || Ok::<_,()>(freq(&s6, 2)));
   let f1 = pool.spawn_fn(move || Ok::<_,()>(freq(&s7, 1)));
-  print_stat(f1.wait().unwrap(), s_len, 1);
-  print_stat(f2.wait().unwrap(), s_len, 2);
+  print_stat(f1.wait().unwrap(), 1);
+  print_stat(f2.wait().unwrap(), 2);
   print::<u8>(f3.wait().unwrap(), "GGT");
   print::<u8>(f4.wait().unwrap(), "GGTA");
   print::<u16>(f5.wait().unwrap(), "GGTATT");
