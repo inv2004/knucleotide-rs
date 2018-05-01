@@ -1,3 +1,10 @@
+//
+//  Url: https://github.com/inv2004/knucleotide-rs
+//  Author: @inv2004
+//  Description:
+//    this update from Rust#6 uses primitive-type generics for HashMap key.
+//
+
 #![feature(test)]
 
 extern crate test;
