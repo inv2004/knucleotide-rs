@@ -5,9 +5,9 @@
 //    this update from Rust#6 uses primitive-type generics for HashMap key.
 //
 
-#![feature(test)]
+// #![feature(test)]
 
-extern crate test;
+// extern crate test;
 
 extern crate futures;
 extern crate futures_cpupool;
