@@ -6,9 +6,7 @@
 // contributed by TeXitoi
 // Rust #4 modified to use same get_seq as Rust #3
 
-#![feature(test)]
-
-extern crate test;
+extern crate bencher;
 
 extern crate futures;
 extern crate futures_cpupool;
@@ -202,9 +200,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use test::Bencher;
+    use bencher::Bencher;
 
-    #[bench]
     fn bench_knuc_rust_6(b: &mut Bencher) {
         b.iter(|| {
             let file = File::open("in250k.txt").unwrap();

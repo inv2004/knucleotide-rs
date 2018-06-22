@@ -3,6 +3,10 @@ name = "knucleotide-rs"
 version = "0.1.0"
 authors = ["inv2004"]
 
+[[bench]]
+name = "bench"
+harness  = false
+
 [dependencies]
 futures = "0.1.21"
 futures-cpupool = "*"
@@ -10,6 +14,7 @@ indexmap = "*"
 # rayon = "*"
 itertools = "*"
 num = "*"
+bencher = "*"
 
 [profile.release]
 opt-level = 3

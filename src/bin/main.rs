@@ -222,18 +222,3 @@ fn main() {
     // let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
     // println!("Seconds: {}", sec);
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use test::Bencher;
-
-    #[bench]
-    fn bench_knuc_main(b: &mut Bencher) {
-        b.iter(|| {
-            let file = File::open("in250k.txt").unwrap();
-            let buf = BufReader::new(file);
-            calc(buf)
-        });
-    }
-}
