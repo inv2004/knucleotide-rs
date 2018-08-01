@@ -16,20 +16,36 @@ macro_rules! println {
 
 #[cfg(test)]
 mod tests {
-    use std;
-    include!("../src/bin/main.rs_");
+    use std::fs::File;
+    use std::io::BufReader;
     use bencher::Bencher;
+    pub mod main {
+        use std;
+        include!("../src/bin/main.rs_");
+    }
+    pub mod rust_4 {
+        use std;
+        // include!("../src/bin/rust_4.rs_");
+    }
 
     fn bench_knuc_main(b: &mut Bencher) {
         b.iter(|| {
-
             let file = File::open("in250k.txt").unwrap();
             let buf = BufReader::new(file);
-            calc(buf)
+            main::calc(buf)
         });
     }
 
-    benchmark_group!(benches, bench_knuc_main);
+    fn bench_knuc_rust_4(b: &mut Bencher) {
+        b.iter(|| {
+            let file = File::open("in250k.txt").unwrap();
+            let buf = BufReader::new(file);
+            main::calc(buf)
+        });
+    }
+
+    benchmark_group!(benches, bench_knuc_main, bench_knuc_rust_4);
+
 }
 
 benchmark_main!(tests::benches);
