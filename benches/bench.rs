@@ -9,9 +9,9 @@ extern crate itertools;
 extern crate num;
 
 macro_rules! println {
-    () => {};
-    ($fmt:expr) => {};
-    ($fmt:expr, $($arg:tt)*) => {};
+    () => {()};
+    ($fmt:expr) => {()};
+    ($fmt:expr, $($arg:tt)*) => {()};
 }
 
 #[cfg(test)]
@@ -21,11 +21,11 @@ mod tests {
     use bencher::Bencher;
     pub mod main {
         use std;
-        include!("../src/bin/main.rs_");
+        include!("../src/bin/main.rs");
     }
     pub mod rust_4 {
         use std;
-        // include!("../src/bin/rust_4.rs_");
+        include!("../src/bin/rust_4.rs");
     }
 
     fn bench_knuc_main(b: &mut Bencher) {

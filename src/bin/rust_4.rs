@@ -133,7 +133,7 @@ impl Item {
                 }
                 println!("");
             }
-            Occ(occ) => (),
+            Occ(occ) => println!("{}\t{}", freq[&Code::from_str(occ)], occ),
         }
     }
     fn gen_freq(&self, input: &[u8]) -> Map {

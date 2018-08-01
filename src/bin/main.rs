@@ -59,30 +59,43 @@ type NaiveHashMap<K, V, T> = IndexMap<K, V, NaiveBuildHasher<T>>;
 type Map<T> = NaiveHashMap<T, u32, T>;
 
 trait ShlXorMsk<T> {
-    fn sh(a: T, x: u8, len: u8) -> T;
+    fn sh(a: T, x: u8, m: T) -> T;
+    fn mask(len: usize) -> T;
 }
 
 impl ShlXorMsk<u8> for u8 {
-    fn sh(a: u8, x: u8, len: u8) -> u8 {
-        ((1u8 << 2 * len) - 1) & (a << 2) | x
+    fn sh(a: u8, x: u8, m: u8) -> u8 {
+        m & (a << 2) | x
+    }
+    fn mask(len: usize) -> u8 {
+        ((1u16 << 2 * len) - 1) as u8
     }
 }
 
 impl ShlXorMsk<u16> for u16 {
-    fn sh(a: u16, x: u8, len: u8) -> u16 {
-        ((1u16 << 2 * len) - 1) & (a << 2) | (x as u16)
+    fn sh(a: u16, x: u8, m: u16) -> u16 {
+        m & (a << 2) | (x as u16)
+    }
+    fn mask(len: usize) -> u16 {
+        ((1u32 << 2 * len) - 1) as u16
     }
 }
 
 impl ShlXorMsk<u32> for u32 {
-    fn sh(a: u32, x: u8, len: u8) -> u32 {
-        ((1u32 << 2 * len) - 1) & (a << 2) | (x as u32)
+    fn sh(a: u32, x: u8, m: u32) -> u32 {
+        m & (a << 2) | (x as u32)
+    }
+    fn mask(len: usize) -> u32 {
+        ((1u64 << 2 * len) - 1) as u32
     }
 }
 
 impl ShlXorMsk<u64> for u64 {
-    fn sh(a: u64, x: u8, len: u8) -> u64 {
-        ((1u64 << 2 * len) - 1) & (a << 2) | (x as u64)
+    fn sh(a: u64, x: u8, m: u64) -> u64 {
+        m & (a << 2) | (x as u64)
+    }
+    fn mask(len: usize) -> u64 {
+        (1u64 << 2 * len) - 1
     }
 }
 
@@ -130,13 +143,12 @@ fn print<
     h: Map<T>,
     seq: &str,
 ) {
-    //let mask = T::from_u64((1u64 << (2 * seq.len() as u32)) - 1).unwrap();
-    let len = seq.len() as u8;
+    let mask = T::from_u64((1u64 << (2 * seq.len() as u32)) - 1).unwrap();
     let k = seq.to_ascii_lowercase()
         .as_bytes()
         .iter()
         .map(|x| 0b11u8 & x >> 1)
-        .fold(T::default(), |acc, x| T::sh(acc, x, len));
+        .fold(T::default(), |acc, x| T::sh(acc, x, mask));
     println!("{}\t{}", h.get(&k).unwrap_or(&0), seq);
 }
 
@@ -144,16 +156,16 @@ fn freq<
     T: FromPrimitive + ToPrimitive + Default + std::hash::Hash + std::cmp::Eq + ShlXorMsk<T> + Copy,
 >(
     s_vec: &[u8],
-    len: u8,
+    len: usize,
 ) -> Map<T> {
     let mut h = Map::default();
-    //let mask = T::mask(len);
+    let mask = T::mask(len);
     let mut it = s_vec.iter();
     let mut a = it.by_ref()
-        .take((len - 1) as usize)
-        .fold(T::default(), |acc, &x| T::sh(acc, x, len));
+        .take(len - 1)
+        .fold(T::default(), |acc, &x| T::sh(acc, x, mask));
     for &x in it {
-        a = T::sh(a, x, len);
+        a = T::sh(a, x, mask);
         *h.entry(a).or_insert(0) += 1;
     }
     h
@@ -195,13 +207,13 @@ pub fn calc<R: std::io::BufRead>(r: R) {
     let s5 = arc_vec.clone();
     let s6 = arc_vec.clone();
     let s7 = arc_vec.clone();
-    let f7 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s1, 18 as u8)));
-    let f6 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s2, 12 as u8)));
-    let f5 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s3, 6 as u8)));
-    let f4 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s4, 4 as u8)));
-    let f3 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s5, 3 as u8)));
-    let f2 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s6, 2 as u8)));
-    let f1 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s7, 1 as u8)));
+    let f7 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s1, 18)));
+    let f6 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s2, 12)));
+    let f5 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s3, 6)));
+    let f4 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s4, 4)));
+    let f3 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s5, 3)));
+    let f2 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s6, 2)));
+    let f1 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s7, 1)));
     print_stat(f1.wait().unwrap(), 1);
     print_stat(f2.wait().unwrap(), 2);
     print::<u8>(f3.wait().unwrap(), "GGT");
