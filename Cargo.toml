@@ -8,8 +8,9 @@ name = "bench"
 harness  = false
 
 [dependencies]
-futures = "0.1.21"
+futures = "0.1.25"
 futures-cpupool = "*"
+tokio-threadpool = "0.1.9"
 indexmap = "*"
 # rayon = "*"
 itertools = "*"

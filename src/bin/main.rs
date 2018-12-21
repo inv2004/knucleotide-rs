@@ -10,13 +10,13 @@
 // extern crate test;
 
 extern crate futures;
-extern crate futures_cpupool;
+extern crate tokio_threadpool;
 extern crate indexmap;
 extern crate itertools;
 extern crate num;
 
-use futures::Future;
-use futures_cpupool::CpuPool;
+use futures::{Future, lazy};
+use self::tokio_threadpool::ThreadPool;
 use indexmap::IndexMap;
 use itertools::Itertools;
 use num::{FromPrimitive, ToPrimitive};
@@ -196,7 +196,7 @@ fn get_seq<R: std::io::BufRead>(mut r: R, key: &[u8]) -> Vec<u8> {
 pub fn calc<R: std::io::BufRead>(r: R) {
     let s_vec = get_seq(r, b">THREE");
 
-    let pool = CpuPool::new_num_cpus();
+    let pool = ThreadPool::new();
 
     let arc_vec = Arc::new(s_vec);
     let s1 = arc_vec.clone();
@@ -206,13 +206,13 @@ pub fn calc<R: std::io::BufRead>(r: R) {
     let s5 = arc_vec.clone();
     let s6 = arc_vec.clone();
     let s7 = arc_vec.clone();
-    let f7 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s1, 18)));
-    let f6 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s2, 12)));
-    let f5 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s3, 6)));
-    let f4 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s4, 4)));
-    let f3 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s5, 3)));
-    let f2 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s6, 2)));
-    let f1 = pool.spawn_fn(move || Ok::<_, ()>(freq(&s7, 1)));
+    let f7 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s1, 18))));
+    let f6 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s2, 12))));
+    let f5 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s3, 6))));
+    let f4 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s4, 4))));
+    let f3 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s5, 3))));
+    let f2 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s6, 2))));
+    let f1 = pool.spawn_handle(lazy(move || Ok::<_, ()>(freq(&s7, 1))));
     print_stat(f1.wait().unwrap(), 1);
     print_stat(f2.wait().unwrap(), 2);
     print::<u8>(f3.wait().unwrap(), "GGT");
