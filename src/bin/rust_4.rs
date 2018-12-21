@@ -15,6 +15,7 @@ use futures::Future;
 use futures_cpupool::CpuPool;
 use self::Item::*;
 use indexmap::IndexMap;
+use std::time::Instant;
 
 struct NaiveHasher(u64);
 impl Default for NaiveHasher {
@@ -195,6 +196,8 @@ pub fn calc<R: std::io::BufRead>(r: R) {
 }
 
 fn main() {
+//    let now = Instant::now();
+
     let stdin = std::io::stdin();
     let input = get_seq(stdin.lock(), b">THREE");
     let input = Arc::new(input);
@@ -210,4 +213,8 @@ fn main() {
     for (item, future_freq) in items.into_iter().rev() {
         item.print(&future_freq.wait().unwrap());
     }
+
+//    let elapsed = now.elapsed();
+//    let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
+//    println!("Seconds: {}", sec);
 }

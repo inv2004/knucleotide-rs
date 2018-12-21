@@ -47,10 +47,10 @@ impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
         self.0 = T::from_u16(i).unwrap();
     }
     fn write_u32(&mut self, i: u32) {
-        self.0 = T::from_u32(i ^ i >> 7).unwrap();
+        self.0 = T::from_u32(i ^ i >> 6).unwrap();
     }
     fn write_u64(&mut self, i: u64) {
-        self.0 = T::from_u64(i ^ i >> 7).unwrap();
+        self.0 = T::from_u64(i ^ i >> 11).unwrap();
     }
 }
 
@@ -121,15 +121,14 @@ fn print_stat(h: Map<u8>, seq_len: usize) {
                 ord1
             }
         })
-        .iter()
         .for_each(|(k, v)| {
             if seq_len == 1 {
-                println!("{} {:.3}", match_key(*k), (100 * v) as f32 / total as f32);
+                println!("{} {:.3}", match_key(k), (100 * v) as f32 / total as f32);
             } else {
                 println!(
                     "{}{} {:.3}",
-                    match_key(*k >> 2),
-                    match_key(0b11 & *k),
+                    match_key(k >> 2),
+                    match_key(0b11 & k),
                     (100 * v) as f32 / total as f32
                 );
             };
@@ -224,12 +223,12 @@ pub fn calc<R: std::io::BufRead>(r: R) {
 }
 
 fn main() {
-    // let now = Instant::now();
+//     let now = Instant::now();
 
     let stdin = std::io::stdin();
     calc(stdin.lock());
 
-    // let elapsed = now.elapsed();
-    // let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
-    // println!("Seconds: {}", sec);
+//     let elapsed = now.elapsed();
+//     let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
+//     println!("Seconds: {}", sec);
 }
