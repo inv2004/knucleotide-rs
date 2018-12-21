@@ -185,7 +185,7 @@ fn get_seq<R: std::io::BufRead>(mut r: R, key: &[u8]) -> Vec<u8> {
     loop {
         line.clear();
         match r.read_until(b'\n', &mut line) {
-            Ok(b) if b > 0 => res.extend(line[..line.len()-1].iter().cloned().map(|x| 0b11 & x >> 1)),
+            Ok(b) if b > 0 => res.extend(line[..line.len()-1].iter().map(|&x| 0b11 & x >> 1)),
             _ => break,
         }
     }
