@@ -5,10 +5,6 @@
 //    this update from Rust#6 uses primitive-type generics for HashMap key.
 //
 
-// #![feature(test)]
-
-// extern crate test;
-
 extern crate futures;
 extern crate tokio_threadpool;
 extern crate indexmap;
@@ -18,15 +14,11 @@ extern crate num;
 use futures::{Future, lazy};
 use self::tokio_threadpool::ThreadPool;
 use indexmap::IndexMap;
-use std::collections::HashMap;
 use itertools::Itertools;
 use num::{FromPrimitive, ToPrimitive};
 use std::cmp::Ordering;
-use std::fs::File;
 use std::hash::{BuildHasherDefault, Hasher};
-use std::io::BufReader;
 use std::sync::Arc;
-use std::time::Instant;
 
 struct NaiveHasher<T>(T);
 impl<T: Default> Default for NaiveHasher<T> {
@@ -57,7 +49,6 @@ impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
 
 type NaiveBuildHasher<T> = BuildHasherDefault<NaiveHasher<T>>;
 type NaiveHashMap<K, V, T> = IndexMap<K, V, NaiveBuildHasher<T>>;
-//type NaiveHashMap<K, V, T> = HashMap<K, V, NaiveBuildHasher<T>>;
 type Map<T> = NaiveHashMap<T, u32, T>;
 
 trait ShlXorMsk<T> {
@@ -225,12 +216,6 @@ pub fn calc<R: std::io::BufRead>(r: R) {
 }
 
 fn main() {
-//     let now = Instant::now();
-
     let stdin = std::io::stdin();
     calc(stdin.lock());
-
-//     let elapsed = now.elapsed();
-//     let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
-//     println!("Seconds: {}", sec);
 }

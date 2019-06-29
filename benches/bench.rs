@@ -40,7 +40,7 @@ mod tests {
         let file = File::open("in250k.txt").unwrap();
         b.iter(|| {
             let buf = BufReader::new(&file);
-            main::calc(buf)
+            rust_4::calc(buf)
         });
     }
 
