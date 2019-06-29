@@ -18,6 +18,7 @@ extern crate num;
 use futures::{Future, lazy};
 use self::tokio_threadpool::ThreadPool;
 use indexmap::IndexMap;
+use std::collections::HashMap;
 use itertools::Itertools;
 use num::{FromPrimitive, ToPrimitive};
 use std::cmp::Ordering;
@@ -56,6 +57,7 @@ impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
 
 type NaiveBuildHasher<T> = BuildHasherDefault<NaiveHasher<T>>;
 type NaiveHashMap<K, V, T> = IndexMap<K, V, NaiveBuildHasher<T>>;
+//type NaiveHashMap<K, V, T> = HashMap<K, V, NaiveBuildHasher<T>>;
 type Map<T> = NaiveHashMap<T, u32, T>;
 
 trait ShlXorMsk<T> {

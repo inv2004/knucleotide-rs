@@ -29,17 +29,17 @@ mod tests {
     }
 
     fn bench_knuc_main(b: &mut Bencher) {
-        b.iter(|| {
-            let file = File::open("in250k.txt").unwrap();
-            let buf = BufReader::new(file);
+        let file = File::open("in250k.txt").unwrap();
+        b.iter( move || {
+            let buf = BufReader::new(&file);
             main::calc(buf)
         });
     }
 
     fn bench_knuc_rust_4(b: &mut Bencher) {
+        let file = File::open("in250k.txt").unwrap();
         b.iter(|| {
-            let file = File::open("in250k.txt").unwrap();
-            let buf = BufReader::new(file);
+            let buf = BufReader::new(&file);
             main::calc(buf)
         });
     }
