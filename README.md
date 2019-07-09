@@ -10,6 +10,6 @@ cargo bench
 
 ### results for in250k.txt
 ```
-test bench_knuc_main   ... bench:   6,553,490 ns/iter (+/- 335,333)
-test bench_knuc_rust_4 ... bench:   6,861,270 ns/iter (+/- 357,601)
+test bench_knuc_main   ... bench:   2,803,175 ns/iter (+/- 412,599)
+test bench_knuc_rust_4 ... bench:   6,995,310 ns/iter (+/- 845,956)
 ```
