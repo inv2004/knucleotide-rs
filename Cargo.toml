@@ -16,6 +16,7 @@ indexmap = "*"
 itertools = "*"
 num = "*"
 bencher = "*"
+hashbrown = "*"
 
 [profile.release]
 opt-level = 3

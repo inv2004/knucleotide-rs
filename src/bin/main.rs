@@ -7,49 +7,18 @@
 
 extern crate futures;
 extern crate tokio_threadpool;
-extern crate indexmap;
 extern crate itertools;
 extern crate num;
+extern crate hashbrown;
 
 use futures::{Future, lazy};
 use self::tokio_threadpool::ThreadPool;
-use indexmap::IndexMap;
 use itertools::Itertools;
 use num::{FromPrimitive, ToPrimitive};
 use std::cmp::Ordering;
-use std::hash::{BuildHasherDefault, Hasher};
 use std::sync::Arc;
 
-struct NaiveHasher<T>(T);
-impl<T: Default> Default for NaiveHasher<T> {
-    fn default() -> Self {
-        NaiveHasher(T::default())
-    }
-}
-impl<T: ToPrimitive + FromPrimitive> Hasher for NaiveHasher<T> {
-    fn finish(&self) -> u64 {
-        self.0.to_u64().unwrap()
-    }
-    fn write(&mut self, _: &[u8]) {
-        unimplemented!()
-    }
-    fn write_u8(&mut self, i: u8) {
-        self.0 = T::from_u8(i).unwrap();
-    }
-    fn write_u16(&mut self, i: u16) {
-        self.0 = T::from_u16(i).unwrap();
-    }
-    fn write_u32(&mut self, i: u32) {
-        self.0 = T::from_u32(i ^ i >> 6).unwrap();
-    }
-    fn write_u64(&mut self, i: u64) {
-        self.0 = T::from_u64(i ^ i >> 11).unwrap();
-    }
-}
-
-type NaiveBuildHasher<T> = BuildHasherDefault<NaiveHasher<T>>;
-type NaiveHashMap<K, V, T> = IndexMap<K, V, NaiveBuildHasher<T>>;
-type Map<T> = NaiveHashMap<T, u32, T>;
+type Map<T> = hashbrown::HashMap<T, u32>;
 
 trait ShlXorMsk<T> {
     fn sh(a: T, x: u8, m: T) -> T;
